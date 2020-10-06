@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<title>service</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="stylesheets/waiter.css">   
+	</head>
+	<body>
+		<div id="main">
+			<div id='toppage'>
+				<h3 style="min-height:5px;">Χρήστης: {{username}} <button v-if="role=='waiter'"v-on:click='togglecreate'>Νέο τραπέζι</button><button id="logb" v-on:click='logout'>Αποσύνδεση</button></h3>
+				
+				<div id="tableoptions" v-if='createtable'>
+					Νο.Τραπεζιού <input type="text" v-model='tablenumber' size="4"> 
+					Άτομα <input type="number" v-model='peoplenumber' min="1" max="30" size="4"> 
+				<button v-on:click='newtable'>Συνέχεια</button>
+				</div>
+			</div>
+			<h2 v-if="tables.length==0">Δεν υπάρχουν παραγγελίες!</h2>
+			<!-- TABLE PROPERTIES ACCORDING TO ROLE -->
+			<div class="props" v-if="props == 'owner'">
+				<ul>
+	  				<li>
+	  					Νο {{currenttable.tnumber}}:
+	  					<button class='propb' v-on:click='vieworder'>Προβολή</button>
+	    				<button class='propb' v-on:click='changeorder'>Τροποποίηση</button>
+	    				<button class='propb' v-on:click='calccheck'>Λογαριασμός</button>
+	    				<button class='propb' v-on:click='removetable'>Διαγραφή</button>
+	  				</li>
+				</ul>
+			</div>
+			<div class="props" v-if="props == 'waiter'">
+				<ul>
+	  				<li>
+	  					Νο {{currenttable.tnumber}}:
+	  					<button class='propb' v-on:click='vieworder'>Προβολή</button>
+	    				<button class='propb' v-on:click='changeorder'>Τροποποίηση</button>
+	    				<button class='propb' v-on:click='requestcheck'>Λογαριασμός</button> 
+	    				<button class='propb' v-on:click=''>Έτοιμο</button> 
+	  				</li>
+				</ul>
+			</div>
+			<div class="props" v-else-if="props == 'kitchen'">
+				<ul>
+	  				<li>
+	  					Νο {{currenttable.tnumber}}:
+	  					<button class='propb' v-on:click='vieworder'>Προβολή</button>
+	    				<button class='propb' v-on:click=''>Σερβίρω</button>
+	  				</li>
+				</ul>
+			</div>
+			<div class="props" v-else-if="props == 'boufe'">
+				<ul>
+	  				<li>
+	  					Νο {{currenttable.tnumber}}:
+	  					<button class='propb' v-on:click='vieworder'>Προβολή</button>
+	    				<button class='propb' v-on:click=''>Σερβίρω</button>
+	  				</li>
+				</ul>
+			</div>
+			<!-- VIEW ORDER -->
+
+			<!-- BOUFE -->
+			<div class="vieworder" v-if="mode=='view' && role=='boufe'">
+				<h3 v-if="currenttable.tgnotes">! {{currenttable.tgnotes}} !</h3>
+				<strong>Ορεκτικά-Σαλάτες:</strong><br>
+				<ul v-for="item in currenttable.torder[0]">
+	  				<li>
+	  					<span v-if="item.ftype[1] == 'cold' || item.ftype[0] == 'salads'">*</span> {{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Κυρίως:</strong><br>
+				<ul v-for="item in currenttable.torder[1]">
+	  				<li>
+	  					<span v-if="item.ftype[1] == 'cold' || item.ftype[0] == 'salads'">*</span> {{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Γλυκά-Καφές:</strong>
+				<ul v-for="item in currenttable.torder[2]">
+	  				<li>
+	  					<span v-if="item.ftype[0] == 'desserts' || item.ftype[0] == 'coffee'">*</span> {{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+			</div>
+			<!-- KITCHEN -->
+			<div class="vieworder" v-else-if="mode=='view' && role=='kitchen'">
+				<h3 v-if="currenttable.tgnotes">! {{currenttable.tgnotes}} !</h3>
+				<strong>Ορεκτικά-Σαλάτες:</strong><br>
+				<ul v-for="item in currenttable.torder[0]">
+	  				<li>
+	  					<span v-if="item.ftype[1] == 'hot' || item.fname.includes('πρώτο')">*</span> {{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Κυρίως:</strong>
+				<ul v-for="item in currenttable.torder[1]">
+	  				<li>
+	  					<template v-if="item.ftype[1] == 'cold' || item.ftype[0] == 'salads'">{{item.quant}} {{item.fname}}</template>
+	  					<template v-else>* {{item.quant}} {{item.fname}}</template>
+	  				</li>
+				</ul>
+			</div>
+
+			<!-- WAITER -->
+			<div class="vieworder" v-else-if="mode=='view' && role=='waiter'">
+				<h3 v-if="currenttable.tgnotes">! {{currenttable.tgnotes}} !</h3>
+				<strong>Ορεκτικά-Σαλάτες:</strong><br>
+				<ul v-for="item in currenttable.torder[0]">
+	  				<li>
+	  					<span v-if="item.ftype[1] == 'bread'">*</span> {{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Κυρίως:</strong><br>
+				<ul v-for="item in currenttable.torder[1]">
+	  				<li>
+	  					{{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Ποτά-Γλυκά:</strong>
+				<ul v-for="item in currenttable.torder[2]">
+	  				<li>
+	  					<span v-if="item.ftype[0] == 'drinks'">*</span> {{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+			</div>
+
+			<!-- OWNER -->
+			<div class="vieworder" v-else-if="mode=='view' && role=='owner'">
+				<h3 v-if="currenttable.tgnotes">! {{currenttable.tgnotes}} !</h3>
+				<strong>Ορεκτικά-Σαλάτες:</strong><br>
+				<ul v-for="item in currenttable.torder[0]">
+	  				<li>
+	  					{{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Κυρίως:</strong><br>
+				<ul v-for="item in currenttable.torder[1]">
+	  				<li>
+	  					{{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+				<strong>Ποτά-Γλυκά:</strong>
+				<ul v-for="item in currenttable.torder[2]">
+	  				<li>
+	  					{{item.quant}} {{item.fname}}
+	  				</li>
+				</ul>
+			</div>
+
+			<div class="vieworder" v-else-if="mode=='check' && role=='owner'">
+				 <h3 style="text-align: center">Τραπέζι {{currenttable.tnumber}} | Σύνολο: {{total}} €</h3>
+				<ul v-for="item in currenttable.torder[0]">
+	  				<li>
+	  					{{item.quant}} - {{item.fname}} | {{item.fprice * item.quant}} € <button :name= "item.fname" category="starters" v-on:click="changeprice($event)">[ AT ]</button>
+	  				</li>
+				</ul>
+				<ul v-for="item in currenttable.torder[1]">
+	  				<li>
+	  					{{item.quant}} - {{item.fname}} | {{item.fprice * item.quant}} € <button :name= "item.fname" category="maincourses" v-on:click="changeprice($event)">[ AT ]</button>
+	  				</li>
+				</ul>
+				<ul v-for="item in currenttable.torder[2]">
+	  				<li>
+	  					{{item.quant}} - {{item.fname}} | {{item.fprice * item.quant}} € <button :name= "item.fname" category="rest"v-on:click="changeprice($event)">[ AT ]</button>
+	  				</li>
+				</ul>
+			</div>
+			<!--COLOR CODES: BLUE - Normal State (Seen) 
+							 RED - New Order (Not opened)
+							 YELLOW - Order Changed(Addon/Removal)
+							 GREEN- Requested bill/Ready to eat(Only for Kitchen)
+							 GREY - Served
+							 BLACK - Complaint
+
+			-->
+			<div id="tables" v-for='table in tables'>
+				<button :name='table.tnumber' class='tableb' v-bind:class="{ newtableb : table.tnew[index] , addonb : (table.talert[index] && table.talert[4].includes('addon')) , requestcheckb : (table.talert[index] && table.talert[4].includes('requestcheck') && role != 'kitchen' && role != 'boufe') }" v-on:click='tableprops'><strong>{{table.tnumber}}</strong><br>{{table.tpeople}} άτομα</button>
+			</div>
+		</div>
+		
+	</body>
+</html>
+
+<script>
+	app = new Vue({
+		el: '#main',
+		
+		data: {
+			username : '',
+			role : '',
+			props : '',
+			mode : '',
+			customprice : 0,
+			index : 0,
+			createtable : false,
+			tablenumber : '',
+			peoplenumber : null,
+			tables : [],
+			currenttable : [],
+			total : 0
+		},
+		methods: {
+			reqlogin : function(){
+				let that = this;
+				axios.post('/public/askauth/')
+				.then(function (response) {
+				// handle success
+				if(response.data.answer != "ok"){
+					window.location.href = response.data.page + ".html";
+				}
+				that.username = response.data.username;
+				that.role = response.data.userrole;
+				let role = that.role;
+				if(role == 'boufe')
+					that.index = 0;
+				else if(role == 'kitchen')
+					that.index = 1;
+				else if(role == 'waiter')
+					that.index = 2;
+				else if(role == 'owner')
+					that.index = 3;
+				
+				})
+				.catch(function (error) {
+				// handle error
+				console.log(error);
+				});
+			},
+			logout : function(event){
+				axios.post('/public/logout/')
+				.then(function (response) {
+				// handle success
+				if(response.data.answer == "ok"){
+					window.location.href = response.data.page + ".html";
+				}
+				})
+				.catch(function (error) {
+				// handle error
+				console.log(error);
+				})
+			},
+			gettables : function(){
+				let that = this;
+				axios.post('/public/gettables/')
+				.then(function (response) {
+				// handle success
+				if(response.data != "table not found"){
+					/* TODO TABLE SORTING AND SELECTIVE VIEW ACCORDING TO ROLE
+					if(that.role == "boufe"){
+						let i;
+						let temp = [];
+						let length = response.data.length;
+						for(i=0; i < length; i++){
+							if(response.data[i].torder[0]){
+								temp.push(response.data[i]);
+							}
+						}
+						that.tables = temp;
+					}
+					else if(that.role == "kitchen"){
+						let i;
+						let temp;
+						let length = response.data.length;
+						for(i=0; i < length; i++){
+							if(response.data[i].torder[1]){
+								temp.push(response.data[i]);
+							}
+						}
+						that.tables = temp;
+					}
+					else{
+						that.tables = response.data;
+					}
+					*/
+					that.tables = response.data;
+				}
+				else
+					console.log("something went wrong at the server");
+				})
+				.catch(function (error) {
+				// handle error
+				console.log(error);
+				})
+			},
+			newtable : function(){
+				let i;
+				let length = this.tables.length;
+				let exists = false;
+				if(this.tablenumber==''){
+					alert("Παρακαλώ συμπληρώστε αριθμό τραπεζιού");
+					return;
+				}
+				for(i=0; i<length; i++){
+					if(this.tables[i].tnumber == this.tablenumber){
+						exists = true;
+						break;
+					}
+				}
+				if(exists){
+					alert("Το τραπέζι " + this.tablenumber + " υπάρχει ήδη!");
+					this.tablenumber = null;
+				}
+				else{
+					let url = '/order.html?tn=' + this.tablenumber + '?tp=' + this.peoplenumber;
+					window.location = url;
+				}
+  			},
+  			removetable : function(){
+  				if(confirm("Είστε σίγουρος/η οτι θέλετε να διαγράψετε το τραπέζι " + this.currenttable.tnumber + " ;")){
+  					axios.post('/public/removetable/', {tablenumber : this.currenttable.tnumber})
+					.catch(function (error) {
+					// handle error
+					console.log(error);
+					});
+  				}},
+  			changeorder : function(){
+  				let number = this.currenttable.tnumber;
+  				let url = '/order.html?ch=' + number; 
+  				window.location = url;
+  			},
+  			changeprice : function(e){
+  				 let newprice = window.prompt("Παρακαλώ εισαγάγετε τη νέα τιμή του προϊόντος","");
+  				 let foodname = e.target.name;
+  				 let category = e.target.getAttribute('category');
+  				 let tablenumber = this.currenttable.tnumber;
+
+  				 if(isNaN(newprice)){
+  				 	alert("Επιτρέπονται μονο αριθμιτικές τιμές ");
+  				 	return;
+  				 }
+  				 else{
+	  				axios.post('/public/storenewprice/', {tablenumber : tablenumber, foodname : foodname, category: category, newprice : newprice})
+						.catch(function (error) {
+						// handle error
+						console.log(error);
+					});
+					window.location.reload();
+				}
+  			},
+			//------------------------------------------------------------------------
+  			requestcheck : function(){
+  				axios.post('/public/requestcheck/', {tablenumber : this.currenttable.tnumber})
+					.catch(function (error) {
+					// handle error
+					console.log(error);
+				});
+  			},
+  			calccheck : function(){
+  				let i;
+  				let total=0;
+  				let order = this.currenttable.torder[0].concat(this.currenttable.torder[1], this.currenttable.torder[2]);
+  				for(i=0; i<order.length;i++){
+  					total += order[i].fprice * order[i].quant;
+  				}
+  				let mode = this.mode;
+  				this.mode = this.toggleorset(mode,"check");
+  				this.total = total;
+  			},
+  			tableprops : function(event){
+  				let i;
+  				let length = this.tables.length;
+  				let table;
+  				let role = this.role;
+
+  				for(i=0; i<length; i++){
+  					if(event.target.name == this.tables[i].tnumber){
+  						table = this.tables[i];
+  						break;
+  					}
+  				}
+  				
+  				this.currenttable = table;
+
+  				//If new table is pressed then mark it as seen (feature only available to kitchen and boufet)
+  				if(role == "kitchen" || role == "boufe"){
+	  				if(table.tnew[this.index] == true){
+	  					axios.post('/public/settoseen/', {tablenumber : table.tnumber , whosaw : role})
+						.catch(function (error) {
+						// handle error
+						console.log(error);
+						});
+	  				}
+	  			}
+	  			if(table.talert[this.index] == true){
+	  				axios.post('/public/alertseen/', {tablenumber : table.tnumber , whosaw : role})
+						.catch(function (error) {
+						// handle error
+						console.log(error);
+						});
+	  			}
+	  			
+	  			this.props = this.toggleorset(this.props, role);
+	  			
+	  			if(this.mode){
+	  				this.mode = this.toggleorset(this.mode);
+	  			}
+			},
+  			vieworder : function(){
+  				let mode = this.mode;
+  				this.mode = this.toggleorset(mode,"view");
+  			},
+			toggleorset : function(value,set){
+			if(value){
+				if(value == true)
+					return false;
+				else
+					return "";
+			}
+			else
+				return set;
+			},
+			togglecreate : function(){
+				if(this.createtable){
+					this.createtable = false;
+				}
+				else
+					this.createtable = true;
+			}
+  			
+		},
+		created : function(){
+			this.reqlogin();
+			this.gettables();
+		},
+		mounted : function () {
+	        this.$nextTick(function () {
+	            window.setInterval(() => {
+	                this.gettables();
+				},7000);
+	        })
+    	}
+	});
+</script>

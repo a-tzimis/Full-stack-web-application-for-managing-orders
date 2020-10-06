@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<title>newtable</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="stylesheets/order.css">	    
+	</head>
+	
+	<body>
+		<div id='main'>
+			<div id='mainmenu'>
+				<div id="toppage">
+					<h3 style="height:5px;">Τραπέζι: {{tablenumber}}<button id="logb" v-on:click='window.history.back();'>Ακύρωση</button><button id="placeorderb" v-on:click='completeorder'>Ολοκλήρωση παραγγελίας</button></h3>
+				</div>
+				<!--Horizontal menu category list-->
+				<div id = "page">
+					<button class='menubutton' name='starters' v-on:click='getfood'>Ορεκτικά</button>
+					<select style="width:auto" name="starterlist" v-if="isStarters" v-on:change='getfood'>
+	    				<option value="all">Όλα</option>
+	    				<option value="hot">Ζεστά</option>
+	    				<option value="cold">Κρύα</option>
+	    				<option value="soup">Σούπες</option>
+	  				</select>
+					<button class='menubutton' name='salads' v-on:click='getfood'>Σαλάτες</button>
+					<button class='menubutton' name='fish' v-on:click='getfood'>Ψάρια</button>
+					<button class='menubutton' name='cooked' v-on:click='getfood'>Μαγειρευτά</button>
+					<button class='menubutton' name='grill' v-on:click='getfood'>Σχάρας</button>
+					<button class='menubutton' name='spaghetti' v-on:click='getfood'>Μακαρόνια</button>
+					<button class='menubutton' name='burgers' v-on:click='getfood'>Μπέργκερ</button>
+					<button class='menubutton' name='pizza' v-on:click='getfood'>Πίτσες</button>
+					<button class='menubutton' name='desserts' v-on:click='getfood'>Επιδόρπιο</button>
+					<select name="dessertlist" v-if="isDesserts" v-on:change='getfood'>
+	    				<option value="all">Όλα</option>
+	    				<option value="sweets">Γλυκά</option>
+	    				<option value="icecream">Παγωτά</option>
+	  				</select>
+					<button class='menubutton' name='coffee' v-on:click='getfood'>Καφές</button>
+				</div>
+			</div>
+			<!--MOBILE-->
+			<div id = "pagemobile">
+					<span id="tableinfo">
+						No: {{tablenumber}}
+						<button style="width: 40px;height:30px; font-size: 15px; color: black;" v-on:click='window.history.back();'>X</button>
+					</span>
+					<button class='menubutton' name='starters' v-on:click='getfood'>Ορεκτικά
+					<select style="width:auto" name="starterlist" v-if="isStarters" v-on:change='getfood'>
+	    				<option value="all">Όλα</option>
+	    				<option value="hot">Ζεστά</option>
+	    				<option value="cold">Κρύα</option>
+	    				<option value="soup">Σούπες</option>
+	  				</select></button>
+					<button class='menubutton' name='salads' v-on:click='getfood'>Σαλάτες</button>
+					<button class='menubutton' name='fish' v-on:click='getfood'>Ψάρια</button>
+					<button class='menubutton' name='cooked' v-on:click='getfood'>Μαγειρευτά</button>
+					<button class='menubutton' name='grill' v-on:click='getfood'>Σχάρας</button>
+					<button class='menubutton' name='spaghetti' v-on:click='getfood'>Μακαρόνια</button>
+					<button class='menubutton' name='burgers' v-on:click='getfood'>Μπέργκερ</button>
+					<button class='menubutton' name='pizza' v-on:click='getfood'>Πίτσες</button>
+					<button class='menubutton' name='desserts' v-on:click='getfood'>Επιδόρπιο
+					<select name="dessertlist" v-if="isDesserts" v-on:change='getfood'>
+	    				<option value="all">Όλα</option>
+	    				<option value="sweets">Γλυκά</option>
+	    				<option value="icecream">Παγωτά</option>
+	  				</select>
+	  				</button>
+					<button class='menubutton' name='coffee' v-on:click='getfood'>Καφές</button>
+			</div>
+			<button id="basket" v-on:click='showbasket'>
+				 <img src="../images/basket.png" alt="Order basket">
+				 {{orderitems}}
+			</button>
+			
+			<div id="centerpage">
+				<div id="menuitems" v-if="food[0]">
+				<ul id="menulist">
+	  				<li v-for="f in food">
+	    				<button class='arbutton' :name='f.fname' v-on:click='addorder'>{{f.fname}}</button> 
+	  				</li>
+				</ul>
+				</div>
+				<div id="generaloptions" v-if="!hasOptions">
+  					Παρατηρήσεις<br>
+  					<textarea v-model='gnotes' name="gnotes" rows="6"></textarea><br><br>
+  					<button class='menubutton' name='notetoprevious' v-on:click='notetoprevious'>στο προηγούμενο</button>
+  					<button class='menubutton' name='generalnote' v-on:click='generalnote'>γενική</button>
+					<h6 id="gnotes" v-if="hasGnotes">Σημειώσεις: {{godnotes}}<h6>
+	  			</div>
+				<div id="foodoptions" v-if="hasOptions">
+					<button id="closebutton" v-on:click="resetvalues">X</button>
+					<h4>{{foodtoadd.fname}} Eπιλογές:</h4>
+					<button class='menubutton' name='place' v-on:click='placeorder'>Προσθήκη</button>
+					<ul v-for="opt in options[0]">
+    					<li><input type="checkbox" v-on:change='fillcheckboxes' :name="opt">{{opt}}</li>
+  					</ul><br><br><br>
+					<select v-if="is2D" v-model='selected'>
+    					<option v-for="opt in options[1]" :name="opt">{{opt}}</option>
+	  				</select>
+	  				<select v-if="is3D" v-model='selected2'>
+    					<option v-for="opt in options[2]" :name="opt">{{opt}}</option>
+	  				</select><br>
+	  				Παρατηρήσεις<br>
+	  				<textarea v-model='fnotes' name="fnotes" rows="6"></textarea><br><br>
+  				</div>
+
+				<div id="orderitems" v-if="order[0]">
+				<button v-on:click="sortorder">Ταξινόμηση</button>
+				<ul id="orderlist">
+	  				<li v-for="o in order" v-if="o.ftype">
+	    				{{o.quant}} {{o.fname}} <button class='orderremove' :name='o.fname' v-on:click='remorder'>-</button>
+	  				</li>
+				</ul>
+				</div>
+				<!--MOBILE-->
+				<div id="mobileorder" v-if="ismobile">
+				<button style= "height: 30px; font-size: 16px;" v-on:click="sortorder">Ταξινόμηση</button>
+				<ul id="orderlist">
+	  				<li v-for="o in order" v-if="o.ftype">
+	    				{{o.quant}} {{o.fname}} <button class='orderremove' :name='o.fname' v-on:click='remorder'>-</button>
+	  				</li>
+				</ul>
+				</div>
+				<button id="placeorderbmobile" v-if="ismobile" v-on:click='completeorder'>Ολοκλήρωση παραγγελίας
+				</button>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script>
+app = new Vue({
+	el: '#main',
+	
+	data: {
+		username : '',
+		tablenumber : 0,
+		peoplenumber : 0,
+		isStarters : false,
+		isDesserts : false,
+		addon : false,
+		food : [],
+		order : [],
+		starters : [],
+		maincourses : [],
+		rest : [],
+		checkboxes : [],
+		foodtoadd : {},
+		hasOptions : false,
+		hasGnotes : false,
+		type : '',
+		options : [],
+		selected : '',
+		selected2 : '',
+		fnotes : '',
+		gnotes : '',
+		godnotes : '',
+		is2D : false,
+		is3D : false,
+		ismobile : false,
+		orderitems : 0,
+		table : {},
+		previousEvent : 0,
+		sauces : ["πιπεράτη","κρασάτη","σκορδάτη","αλα κρέμ","σίζλερ","δυόσμου","χωρίς σάλτσα"],
+		ing : ["ζαμπόν", "μπέικον", "μανιτάρια" , "ντομάτα", "κρεμμύδι", "πιπεριά", "λουκάνικο" , "τυρί" , "φέτα", "ελιές"],
+		sizes : ["μεγάλη", "μικρή"]
+	},
+	methods: {
+		reqlogin : function(){
+			axios.post('/public/askauth/')
+			.then(function (response) {
+			// handle success
+			if(response.data.answer != "ok"){
+				window.location.href = response.data.page + ".html";
+			}
+			else{
+				this.username = response.data.username;
+			}
+			})
+			.catch(function (error) {
+			// handle error
+			console.log(error);
+			});
+		},
+		getfood : function(event){
+			//Color selected button to highlight choice
+			if(this.previousEvent == 0){
+				event.target.style.borderBottom = "thick solid grey";
+			}else{
+				this.previousEvent.style.borderBottom = "none";
+				event.target.style.borderBottom = "thick solid grey";
+			}
+			this.previousEvent = event.target;
+
+			//Clear previous options
+			if(this.hasOptions){
+				this.resetvalues();
+			}
+			if(event.target.name == "starterlist" || event.target.name == "dessertlist"){
+				if(event.target.value != "all"){
+					this.type = event.target.value;
+				}
+				else{
+					if(event.target.name == "starterlist")
+						this.type = "starters";
+					else if(event.target.name == "dessertlist")
+						this.type = "desserts";
+				}
+			}
+			else{
+				this.type = event.target.name;
+				if(this.type == "starters"){
+					this.isStarters = true;
+				}
+				else if(this.type == "desserts"){
+					this.isDesserts = true;
+				}
+				else{
+					this.isStarters = false;
+					this.isDesserts = false;
+				}
+			}
+
+			let that = this;
+			axios.post('/public/getfood/', {foodtype : this.type})
+			.then(function (response) {
+			// handle success
+			if(response.data != "foodnotfound"){
+				//console.log(response.data);
+				that.food = response.data;
+			}
+			else
+				console.log("Not in the menu");
+			})
+			.catch(function (error) {
+			// handle error
+			console.log(error);
+			})
+		},
+		addorder : function(event){
+			this.resetvalues();
+			this.unfillcheckboxes();
+			//Grab object
+			for(let i = 0; i < this.food.length; i++){
+				if(this.food[i]['fname'] == event.target.name){
+					this.foodtoadd = this.food[i];
+					break;
+				}
+			}
+			//Check has options
+			this.hasOptions = this.checkoptions(this.foodtoadd);
+			if(this.hasOptions){
+				return;
+			}
+			
+			//Add to order
+			this.placeorder();
+		},
+		placeorder : function(){
+			let fpe = this.foodtoadd.fname; //fpe = food plus extras
+			let foodtype = this.foodtoadd.ftype; 
+			let finalprice = this.foodtoadd.fprice;
+			if(this.selected && (this.selected != '')){
+				fpe += "[" + this.selected + "]";
+				if(this.sauces.includes(this.selected)){
+					if(this.selected == "χωρίς σάλτσα"){
+
+					}else{
+						finalprice += 1.5;
+					}
+				}
+				if(this.foodtoadd.ftype == 'pizza'){
+					if(this.selected == "μεγάλη"){
+						finalprice += 1;
+						if(this.foodtoadd.fname.includes("Χωριάτικη"))
+							finalprice += 1;
+					}
+				}
+			}
+			if(this.selected2 && (this.selected2 != '')){
+				fpe += "[" + this.selected2 + "]";
+			}
+			if(this.checkboxes.length!=0){
+				fpe += "[";
+				for(let i=0; i < this.checkboxes.length; i++){
+					fpe += this.checkboxes[i] + "-";
+					if(this.ing.includes(this.checkboxes[i])){
+						finalprice += 0.5;
+					}
+					else if(this.checkboxes[i] == "με παγωτό"){
+						finalprice += 1;
+					}
+					else if(this.checkboxes[i] == "με μπεϊλις"){
+						finalprice += 2.5;
+					}
+					else if(this.sizes.includes(this.checkboxes[i])){
+						//Salad
+						if(this.foodtoadd.ftype == "salads"){
+							finalprice -= 2;
+						}
+					}
+				}
+				fpe = fpe.slice(0,-1);
+				fpe += "]";
+			}
+			if(this.fnotes != ''){
+				fpe += "[" + this.fnotes + "]";
+			}
+			if(this.addon){
+				fpe += ' [Επιπρόσθετο]'
+			}
+
+			for(let i = 0; i < this.order.length; i++){
+				if(this.order[i]['fname'] == fpe){
+					this.order[i]['quant'] += 1;
+					this.orderitems++;
+					return;
+				}
+			}
+			this.orderitems++;
+			this.order.push({'fname' : fpe , 'quant' : 1, 'ftype' : foodtype , fprice : finalprice});
+			//Inform basket has new item in case of mobile view
+			document.getElementById("basket").style.backgroundColor = "red";
+		},
+		checkoptions : function(f){
+			//Rest of the options have to be global variables so that placeorder can increase the food price accoordingly
+			let garnishes = ["τηγανιτές", "φούρνου", "βραστές", "ρύζι", "λαχανικά" , "σαλάτα", "σκέτο"];
+			let cooking = ["blue", "rare", "medium rare", "medium well", "well done"];
+
+			if(f.ftype[0] == "starters" || f.ftype == "salads"){
+				if(f.foptions && (f.foptions[f.foptions.length-1] != "για δεύτερο"))
+					f.foptions.push("για δεύτερο");
+				else if(!f.foptions)
+					f.foptions = ["για δεύτερο"];
+			}
+			if(f.foptions){
+				if(f.foptions[0] == "garnish" && f.foptions[1] == "sauce" && f.foptions[2] == "cooking"){		
+					this.is2D = true;
+					this.is3D = true;
+					this.options[0] = garnishes;
+					this.options[1] = this.sauces;
+					this.options[2] = cooking;
+				}
+				else if(f.foptions[0] == "garnish" && f.foptions[1] == "sauce"){		
+					this.is2D = true;
+					this.options[0] = garnishes;
+					this.options[1] = this.sauces;
+				}
+
+				else if(f.foptions[0] == "garnish" && f.foptions[1] == "cooking"){		
+					this.is2D = true;
+					this.options[0] = garnishes;
+					this.options[1] = cooking;
+				}
+
+				else if(f.foptions[0] == "size" && f.foptions[1] == "ingr"){
+					this.is2D = true;
+					this.options[0] = this.ing;
+					this.options[1] = this.sizes;
+				}
+
+				else if(f.foptions[0] == "garnish"){
+					this.is2D = false;
+					this.options[0] = garnishes;
+				}
+
+				else{
+					this.is2D = false;
+					this.options[0] = f.foptions;
+					this.options[1] = "";
+				}
+					
+				return true;	
+			}
+			else
+				return false;
+		},
+		remorder : function(event){
+			if(this.order.length == 0)
+				return;
+			let i;
+			for(i = 0; i < this.order.length; i++){
+				if(this.order[i]['fname'] == event.target.name){
+					if(this.addon){
+
+						this.godnotes += " Αφαιρέθηκε[" + this.order[i].fname + "]";
+						this.hasGnotes = true;
+					}
+					let quant = this.order[i].quant;
+					if(quant > 1){
+						this.order[i]['quant'] -= 1;
+						break;
+					}
+					else if(quant == 1){
+						this.order.splice(i,1);
+						break;
+					}
+				}
+			}
+			this.orderitems--;
+		},
+		completeorder : function(){
+			if(this.order.length == 0){
+					alert("Μια παραγγελία δεν μπορεί να είναι κενή");
+					return;
+			}
+			if(confirm("Είστε σίγουρος/η")){
+				//get order time
+				let today = new Date();
+				let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+				let alerts = [true, true, true, true, ""];
+				//sort order table
+				this.sortorder();
+				if(this.addon){
+					alerts[4] += "addon";
+				}
+				
+				this.table = {tnumber : this.tablenumber , tpeople : this.peoplenumber , tnew : [true,true,false,false] , torder : [this.starters, this.maincourses, this.rest], tgnotes : this.godnotes , ttime : time ,tstartersserved : [false, false,""] , tmainsserved : [false, ""] , talert : alerts};
+				/*
+				talert: First three elements represent who saw amongst boufe, kitchen, waiter(s) and owner while last element (string) represents the alert itself, an example would be if a table had an addon and had asked for the bill then the table would have the following stucture [true, true, true, true "addonbill"], once someone is informed of the change then one or more of the boolean values will be changed.
+				-----------------------------------------------------------------------------------------
+				tnew: Elements represent who saw amongst owner, waiter(s), kitchen and boufet
+				*/
+
+				axios.post('/public/completeorder/', {table : this.table})
+				.then(function (response) {
+					if(response.data == 'ok'){}
+						window.history.back();
+					
+				})
+				.catch(function (error) {
+				// handle error
+				console.log(error);
+				});
+			}
+		},
+		sortorder : function(){
+			let order = [];
+			order = this.order;
+			let sorted = [];
+			let starters = [];
+			let maincourses = [];
+			let rest = [];
+			this.orderitems = 0; //Recount them
+			let length = order.length;
+			let i;
+			let temp;
+			if(length == 0)
+				return;
+
+			for(i=0; i<length;i++){
+				temp = order[i].ftype[0];
+				if(temp == "starters" || temp == "salads"){
+					if(order[i].fname.includes("για δεύτερο")){
+						order[i].ftype.push("asmain");
+						maincourses.push(order[i]);
+					}
+					else{
+						starters.push(order[i]);
+					}
+					this.orderitems += order[i].quant;
+				}
+				else if(temp == "cooked" || temp == "grill" || temp == "fish" || temp == "spaghetti" || temp == "pizza" || temp == "burgers" || temp == "special"){
+					if(order[i].fname.includes("πρώτο") || order[i].fname.includes("πρωτο")){
+						order[i].ftype.push("asstarter");
+						starters.push(order[i]);
+					}
+					else{
+						maincourses.push(order[i]);
+					}
+					this.orderitems += order[i].quant;
+				}
+				else{
+					rest.push(order[i]);
+					this.orderitems += order[i].quant;
+				}
+				
+			}
+			this.starters = starters;
+			this.maincourses = maincourses;
+			this.rest = rest;
+			sorted = starters.concat(maincourses, rest);
+			this.order = sorted;
+		},
+		//In case change order was requested
+		getorder : function(){
+			let that = this;
+			axios.post('/public/getorder/', {number : this.tablenumber})
+			.then(function (response) {
+				if(response.data != 'ordernotfound'){
+					that.order = response.data.order;
+					that.sortorder();
+					if(that.starters.length != 0 || that.maincourses.length != 0){
+						that.addon = true;
+					}
+					if(response.data.tgnotes != ''){
+						that.hasGnotes = true;
+						that.godnotes = response.data.tgnotes;
+					}
+
+				}
+				else
+					console.log("order not present");
+					
+			})
+			.catch(function (error) {
+			// handle error
+			console.log(error);
+			});
+		},
+		toggleorset : function(value,set){
+			if(value){
+				if(value == true)
+					return false;
+				else
+					return "";
+			}
+			else
+				return set;
+		},
+		showbasket : function(){
+			this.ismobile = this.toggleorset(this.ismobile, true);
+			document.getElementById("basket").style.backgroundColor = "rgba(0,0,0,0.6)";
+		},	
+		fillcheckboxes : function(event){
+			if(event.target.checked)
+				this.checkboxes.push(event.target.name);
+			else{
+				for(let i=0; i < this.checkboxes.length; i++){
+					if(this.checkboxes[i] == event.target.name){
+						this.checkboxes.splice(i,1);
+					}
+				}
+			}
+		},
+		unfillcheckboxes : function(){
+			let inputs, index;
+
+			inputs = document.getElementsByTagName('input');
+			for (index = 0; index < inputs.length; ++index) {
+				if(inputs[index].checked){
+					inputs[index].checked = false;
+				}
+			}
+		},
+		notetoprevious : function(){
+			if(this.order.length > 0 && this.gnotes != ''){
+				this.order[this.order.length-1].fname += "[" + this.gnotes + "]";
+				this.gnotes = '';
+			}
+		},
+		generalnote : function(){
+			if(this.gnotes != ''){
+				this.hasGnotes = true;
+				this.godnotes += ' ' + this.gnotes;
+				this.gnotes = '';
+			}
+			else if(this.gnotes == '' && this.godnotes != ''){
+				if(confirm("Καθαρισμός γενικών παρτηρήσεων;")){
+					this.godnotes = '';
+					this.hasGnotes = false;
+				}
+			}
+		},
+		resetvalues : function(){
+			this.hasOptions = false;
+			this.is2D = false;
+			this.is3D = false;
+			this.selected = '';
+			this.selected2 = '';
+			this.fnotes = '';
+			this.gnotes = '';
+			this.options[0] = [];
+			this.options[1] = [];
+			this.options[2] = [];
+			this.foodtoadd = [];
+			this.checkboxes = [];
+		}
+			
+	},
+	created : function(){
+		this.reqlogin();
+		//table details (hardcode becuse I know the url structure)
+		let match;
+		match = window.location.href.match(/tn=(\w+)/);
+		if(match==null){
+			match = window.location.href.match(/ch=(\w+)/);
+			this.tablenumber = match[1];
+			this.getorder();
+		}
+		else{
+			this.tablenumber = match[1];
+			match = window.location.href.match(/tp=(\d+)/);
+			this.peoplenumber = match[1];
+		}
+	}
+})
+</script>

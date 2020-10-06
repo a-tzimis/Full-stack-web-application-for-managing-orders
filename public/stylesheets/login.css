@@ -1,0 +1,53 @@
+body{
+	 width: 100%;
+}
+
+html { 
+  background: url(/images/stani.png) no-repeat; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.center {
+  padding: 100% 50px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 2px solid;
+  border-bottom: none;
+  position: absolute;
+  height:auto;
+  left: 50%;
+  top: 20%;
+  transform: translate(-50%, -50%);
+}
+/*tablets*/
+@media (min-width: 768px) and (max-width: 1024px)  {
+	@media screen and (orientation:landscape){ 
+		.center{
+			font-size: 17px;
+			zoom:1.6;
+		}
+	}
+
+	@media screen and (orientation:portrait){
+		.center{
+			font-size: 12px;
+			zoom:2.3;
+		}
+	}
+}
+/*phones*/
+@media screen and (min-resolution: 150dpi) {
+	 @media screen and (orientation:portrait){
+	 	.center{
+	 		font-size: 14px;
+	 		zoom: 2.8;
+	 	}
+	 }
+	 @media screen and (orientation:landscape){ 
+		.center{
+			zoom:1.3;
+		}
+	}
+}

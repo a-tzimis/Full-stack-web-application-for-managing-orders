@@ -1,0 +1,283 @@
+body {
+	text-align: center;
+	font-family: "Times New Roman", Times, serif;
+}
+ul{
+	list-style-type: none;
+}
+ul li{
+	margin-bottom: 5px;
+}
+textarea{
+	font-size: 18px;
+}
+
+#page{
+	overflow: auto;
+	white-space: nowrap;
+}
+#page select{
+	font-size: 14px;
+}
+.menubutton{
+  display: inline-block;
+  background-color: #4CAF50; /* Green */
+  font-size: 20px;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+}
+
+.arbutton{
+	background-color: #4CAF50;
+	font-size: 20px;
+	border: none;
+  	color: white;
+  	padding: 5px 20px;
+  	text-align: center;
+}
+.orderremove{
+	background-color: rgba(228, 27, 37,0.5);
+	border: none;
+  	color: white;
+  	padding: 5px 20px;
+  	text-align: center;
+}
+
+
+#mainmenu{
+	position: relative;
+	margin-top: 3%;
+	font-size: 24px;
+  	left: 50%;
+  	width: 100%;
+  	height: auto;
+  	color: black;
+	background-color: #F0E5DD;
+  	transform: translate(-50%, -50%);
+}
+#centerpage{.
+	position: relative;
+	width: 100%;
+	height: auto;
+}
+#pagemobile{
+	visibility: hidden;
+}
+#basket{
+	visibility: hidden;
+}
+#mobileorder{
+	visibility: hidden;
+}
+#menuitems{
+	position: fixed;
+	float: left;
+	margin-left:7%;
+	width: 20%;
+	background-color: rgba(0,0,0,0.6);
+	color: white;
+	text-align: left;
+	max-height: 90%;
+	overflow: auto;
+}
+#generaloptions, #foodoptions{
+	font-size: 25px;
+	position: fixed;
+	width: 30%;
+	margin-top:15%;
+	height: 60%;
+	overflow: auto;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+}
+#foodoptions ul {
+	width: 100%;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+#foodoptions ul li{
+	display: block;
+	float: left;
+}
+#foodoptions select{
+	width: 80%;
+	font-size: 17px;
+	align-content: center;
+}
+
+#orderitems{
+	font-size: 25px;
+	position: absolute;
+	right: 0;
+	margin-right:7%;
+	width: 30%;
+	background-color: rgba(0,0,0,0.6);
+	color: white;
+	text-align: right;
+}
+#logb{
+	position: absolute;
+	border: none;
+	color: white;
+	background-color: red;
+	left: 0%;
+	top:0%;
+	font-size: 18px;
+}
+#placeorderb{
+	position: absolute;
+	border: none;
+	color: white;
+	background-color: green;
+	right: 0%;
+	top:0%;
+	font-size: 18px;
+}
+#closebutton{
+	float: left;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-size: 20px;
+	background-color: red;
+	color: white;
+	border: none;
+}
+/*tablets*/
+@media (min-width: 768px) and (max-width: 1600px)  {
+	#mainmenu{
+		margin-top: 5%;
+	}
+	#menuitems{
+		margin-left: 0px;
+		top: 22%;
+		width: 35%;
+	}
+	#orderitems{
+		margin-right: 0px;
+		top: 22%;
+		width: 35%;
+	}
+	#foodoptions, #generaloptions{
+		top: 27%;
+		width: 28%;
+	}
+}
+/*phones*/
+@media (min-width: 200px) and (max-width: 767px) {
+	 @media screen and (orientation:portrait){
+	 	#toppage, #page{
+	 		display: none;
+	 	}
+	 	#menuitems{
+	 		position: fixed;
+	 		display: block;
+	 		overflow: scroll;
+	 		width: 100%;
+	 		height: 65%;
+	 		margin:0px;
+	 		top:34%;
+	 		background-color: white;
+	 	}
+	 	#menuitems ul{
+	 		padding-left: 0;
+	 	}
+	 	#menuitems button{
+	 		width: 100%;
+	 		margin-bottom: 2px;
+	 		/*background-color: #00dbff;*/
+	 	}
+	 	.arbutton{
+			background-color: rgba(0,0,0,0.6);
+			font-size: 22px;
+			color: white;
+		}
+		#pagemobile select{
+			font-size: 13px;
+		}
+	 	#tableinfo{
+	 		position: fixed;
+	 		font-size: 22px;
+	 		left: 1%;
+	 		top: 1%;
+	 		padding: 5px;
+	 		background-color: rgba(0,0,0,0.6);
+	 		color: white;
+	 		visibility: visible;
+	 	}
+	 	#pagemobile{
+	 		visibility: visible; 
+	 		position: fixed;
+	 		top:0%;
+	 		height: 34%;
+	 		overflow:scroll;
+	 		display: block;
+	 		width:100%;
+	 		float: left;
+	 	}
+	 	#pagemobile button{
+	 		width:100%;
+	 		background-color: white;
+	 		color:black;
+	 	}
+	 	#basket{
+	 		position: absolute;
+	 		font-size: 25px;
+	 		right: 1%;
+	 		top: 1%;
+	 		padding: 5px;
+	 		background-color: rgba(0,0,0,0.6);
+	 		color: white;
+	 		visibility: visible;
+	 	}
+	 	#mobileorder{
+	 		visibility: visible;
+	 		position:fixed;
+	 		top: 40%;
+	 		height: 60%;
+	 		width: 90%;
+	 		background-color: rgba(0,0,0,0.9);
+	 		color: white;
+	 		text-align: left;
+	 		overflow:scroll;
+	 		display: block;
+	 		font-size: 25px;
+	 		left: 50%;
+  			transform: translate(-50%, -50%);
+		}
+		#mobileorder li{
+			margin-bottom: 15px;
+		}
+	 	#foodoptions{
+	 		font-size: 25px;
+	 		width: 100%;
+	 		padding: 20px;
+	 		top: 30%;
+	 		height: 75%;
+	 		background-color: rgba(0,0,0,0.8);
+	 		color: white;
+	 	}
+	 	#placeorderbmobile{
+	 		position:absolute;
+			font-size: 18px;
+			color: white;
+			left: 50%;
+			width:90%;
+			bottom: 18%;
+			transform: translate(-50%, -50%);
+			padding: 10px 10px;
+			background-color: rgba(0,0,0,0.8);
+			border: 1px solid black;
+	 	}
+	 	#generaloptions{
+	 		display: none;
+	 	}
+	 	#orderitems{
+	 		display: none;
+	 	}
+	 	#placeorderb{
+	 		display: none;
+	 	}
+	 }
+}

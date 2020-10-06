@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
+		<title>login</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="stylesheets/login.css">
+	</head>
+	<body>
+		<div id="root" class="center">
+			<h3>Παρακαλώ συνδεθείτε</h3> <br>
+			<h5 v-if="wrongcre" style="color:red">Λάθος στοιχεία. Παρακαλω προσπαθήστε ξανά</h5>
+			<input v-model='userinput' v-bind:type="type" v-bind:placeholder="holder" v-on:keyup.enter="getinput">
+			<br><span v-if="ajaxRequest">Φόρτωση...</span>
+		</div>
+	</body>
+</html>
+
+<script>
+app = new Vue({
+	el: '#root',
+	data: {
+		userinput: '',
+		type: 'text',
+		holder: 'Όνομα',
+		username: '',
+		password: '',
+		ajaxRequest: false,
+		wrongcre: false,
+	postResults: []
+	},
+	methods: {
+		getinput : function(){
+			if(this.userinput.length < 2)
+				return
+			else if(this.type == 'text'){
+				this.wrongcre = false;
+				this.username = this.userinput
+				this.userinput = ''
+				this.type = 'password'
+				this.holder = 'Κωδικός'
+			}
+			else if(this.type == 'password'){
+				this.password = this.userinput
+				this.ajaxRequest = true;
+				axios.post('/public/requestlogin/', {usrn : this.username, pass : this.password})
+			  .then(function (response) {
+			    if(response.data.answer == "kick"){
+			    	window.location.href = response.data.page + ".html?";
+			    }
+			    else
+			    	window.location.href = response.data.page + ".html";
+			    	
+			  })
+			  .catch(function (error) {
+			    // handle error
+			    console.log(error);
+			  });
+			}
+			
+		}
+	},
+	created : function(){
+		if(window.location.href.includes('?'))
+			this.wrongcre = true;
+	}
+		
+})		
+</script>

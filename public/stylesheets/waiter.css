@@ -1,0 +1,188 @@
+body {
+	font-family: "Times New Roman", Times, serif;
+}
+
+ul {
+  list-style-type: none;
+  width: 100%;
+  background-color: #f1f1f1;
+}
+
+li button {
+  margin-left: 1%;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+ul li{
+	text-align: center;
+	font-size: 22px;
+}
+
+input[type=number]{
+	height: 20px;
+    width: 40px;
+}
+
+#toppage{
+	position: relative;
+	width: 100%;
+	background-color: #FFFFD4;
+	height:auto;
+	min-height:50px;
+	font-size: 25px;
+	margin-bottom: 20px;
+}
+
+#logb{
+	position: absolute;
+	font-size: 20px;
+	border: none;
+	color: white;
+	right: 5%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	background-color: red;
+}
+
+#tableoptions{
+	margin-top: 2%;
+}
+#tables{
+	position: relative;
+	width:100%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+.tableb{
+	font-size: 25px;
+	text-align: center;
+	display: inline;
+	float: left;
+	padding : 10px;
+	margin-left: 5px;
+	margin-bottom: 5px;
+	background-color: rgb(0,191,255);
+	border: 2px solid;
+}
+.newtableb{
+	background-color: red;
+}
+.addonb{
+	background-color: yellow;
+}
+.requestcheckb{
+	background-color: green;
+}
+
+.props{
+	margin-top: 0;
+	width: 100%
+}
+.vieworder{
+	font-size: 20px;
+}
+
+
+/*tablets*/
+@media (min-width: 768px) and (max-width: 1024px)  {
+		#toppage button{
+			font-size: 15px;
+		}
+		#logb{
+			font-size:15px; 
+		}
+		.propb{
+			font-size: 17px;
+		}
+		.tableb{
+			font-size: 30px;
+		}
+		.vieworder li{
+			font-size: 23px;
+		}
+}
+/*phones*/
+@media (min-width: 200px) and (max-width: 767px) {
+	 @media screen and (orientation:portrait){
+	 	#toppage{
+	 		font-size:17px;
+	 	}	 	
+	 	#toppage button{
+			font-size: 12px;
+			height: 20px;
+		}
+		#tables{
+			max-width: 65%;
+		}
+		#logb{
+			width: 100px;
+			padding:0;
+			margin top:15px;
+			top:0%;
+			right:0%;
+		}
+		.props{
+			width:30%;
+			display: block;
+			float: right;
+		}
+		.props ul{
+			width:60px;
+			font-size: 18px;
+			height: auto;
+			padding-left:0px;
+			padding-right: 70px;
+		}
+		.propb{
+			font-size: 15px;
+			margin-bottom: 15px;
+		}
+		.tableb{
+			font-size: 25px;
+		}
+		.vieworder{
+			width:65%;
+			font-size: 20px;
+			float: left;
+			margin-bottom: 50px;
+		}
+		.vieworder ul{
+			padding-left: 0px;
+		}
+		.vieworder li{
+			font-size: 20px;
+		}
+	 }
+	 @media screen and (orientation:landscape){ 
+		#toppage{
+	 		font-size:14px;
+	 	}	 	
+	 	#toppage button{
+			font-size: 15px;
+		}
+		.props{
+			margin-top: 0px;
+		}
+		.props ul{
+			font-size: 18px;
+			padding-left:0px;
+		}
+		.propb{
+			font-size: 15px;
+		}
+		.tableb{
+			font-size: 22px;
+		}
+		.vieworder{
+			font-size: 14px;
+		}
+		.vieworder ul{
+			padding-left: 0px;
+		}
+		.vieworder li{
+			font-size: 16px;
+		}
+	}
+}
+
+
