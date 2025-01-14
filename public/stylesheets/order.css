@@ -1,6 +1,8 @@
 body {
 	text-align: center;
-	font-family: "Times New Roman", Times, serif;
+	font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
+	font-weight: normal;
+	touch-action: manipulation;
 }
 ul{
 	list-style-type: none;
@@ -9,7 +11,11 @@ ul li{
 	margin-bottom: 5px;
 }
 textarea{
+	margin: 30px 25% 10px 20%;
 	font-size: 18px;
+}
+button{
+	border-radius: 15px;
 }
 
 #page{
@@ -21,30 +27,32 @@ textarea{
 }
 .menubutton{
   display: inline-block;
-  background-color: #4CAF50; /* Green */
+  background-color: lightgreen;
+  color:black;
+  margin-bottom:5px;
   font-size: 20px;
   border: none;
-  color: white;
   padding: 10px 20px;
   text-align: center;
 }
 
 .arbutton{
-	background-color: #4CAF50;
+	background-color: lightgreen;
+	color:black;
 	font-size: 20px;
 	border: none;
-  	color: white;
-  	padding: 5px 20px;
+  	padding: 8px 10px 8px 10px;
+	width: 250px;
   	text-align: center;
 }
 .orderremove{
 	background-color: rgba(228, 27, 37,0.5);
+	font-size:15px;
 	border: none;
   	color: white;
   	padding: 5px 20px;
   	text-align: center;
 }
-
 
 #mainmenu{
 	position: relative;
@@ -57,7 +65,7 @@ textarea{
 	background-color: #F0E5DD;
   	transform: translate(-50%, -50%);
 }
-#centerpage{.
+#centerpage{
 	position: relative;
 	width: 100%;
 	height: auto;
@@ -67,6 +75,9 @@ textarea{
 }
 #basket{
 	visibility: hidden;
+}
+#basket img{
+	display:none;
 }
 #mobileorder{
 	visibility: hidden;
@@ -97,31 +108,35 @@ textarea{
 	padding-left: 10px;
 	padding-right: 10px;
 }
-#foodoptions ul li{
+#foodoptions li{
 	display: block;
-	float: left;
+	float:left;
+	margin: 5px 5px 5px 5px;
 }
 #foodoptions select{
 	width: 80%;
 	font-size: 17px;
 	align-content: center;
+	margin-bottom:10px;
 }
 
-#orderitems{
+#orderitems {
+	position:fixed;
 	font-size: 25px;
-	position: absolute;
 	right: 0;
-	margin-right:7%;
-	width: 30%;
+	margin-right: 7%;
+	width: 28%;
 	background-color: rgba(0,0,0,0.6);
 	color: white;
-	text-align: right;
+	text-align: left;
+	max-height: 90%;
+	overflow:auto;
 }
 #logb{
 	position: absolute;
 	border: none;
-	color: white;
-	background-color: red;
+	color: black;
+	background-color: lightcoral;
 	left: 0%;
 	top:0%;
 	font-size: 18px;
@@ -129,38 +144,42 @@ textarea{
 #placeorderb{
 	position: absolute;
 	border: none;
-	color: white;
-	background-color: green;
+	color: black;
+	background-color: lightgreen;
 	right: 0%;
 	top:0%;
 	font-size: 18px;
 }
 #closebutton{
 	float: left;
-	padding-left: 5px;
-	padding-right: 5px;
+	padding:5px 20px 5px 20px;
 	font-size: 20px;
-	background-color: red;
+	background-color: lightcoral;
 	color: white;
 	border: none;
 }
 /*tablets*/
 @media (min-width: 768px) and (max-width: 1600px)  {
 	#mainmenu{
-		margin-top: 5%;
+		margin-top: 7%;
 	}
 	#menuitems{
-		margin-left: 0px;
-		top: 22%;
+		margin-left: 0%;
+		top: 30%;
 		width: 35%;
+	}
+	textarea {
+		margin-top: 20px;
+		width:200px;
+		margin-left: 8%;
 	}
 	#orderitems{
 		margin-right: 0px;
-		top: 22%;
+		top: 30%;
 		width: 35%;
 	}
 	#foodoptions, #generaloptions{
-		top: 27%;
+		top: 30%;
 		width: 28%;
 	}
 }
@@ -221,28 +240,38 @@ textarea{
 	 		background-color: white;
 	 		color:black;
 	 	}
-	 	#basket{
-	 		position: absolute;
-	 		font-size: 25px;
-	 		right: 1%;
-	 		top: 1%;
-	 		padding: 5px;
-	 		background-color: rgba(0,0,0,0.6);
-	 		color: white;
-	 		visibility: visible;
-	 	}
+		#basket {
+			position: absolute;
+			font-size: 23px;
+			right: 1%;
+			top: 1%;
+			padding: 5px;
+			background-color: rgba(0,0,0,0.6);
+			color: white;
+			visibility: visible;
+		}
+		#basket img{
+			display: initial;
+			width:35x;
+			height: 35px;
+		}
+		@keyframes blinker {
+			50% {
+				opacity: 0;
+			}
+		}
 	 	#mobileorder{
 	 		visibility: visible;
 	 		position:fixed;
-	 		top: 40%;
-	 		height: 60%;
-	 		width: 90%;
+	 		top: 43%;
+	 		height: 65%;
+	 		width: 99%;
 	 		background-color: rgba(0,0,0,0.9);
 	 		color: white;
 	 		text-align: left;
 	 		overflow:scroll;
 	 		display: block;
-	 		font-size: 25px;
+	 		font-size: 20px;
 	 		left: 50%;
   			transform: translate(-50%, -50%);
 		}
@@ -251,23 +280,23 @@ textarea{
 		}
 	 	#foodoptions{
 	 		font-size: 25px;
-	 		width: 100%;
+	 		width: 90%;
 	 		padding: 20px;
-	 		top: 30%;
+	 		top: 40%;
 	 		height: 75%;
 	 		background-color: rgba(0,0,0,0.8);
 	 		color: white;
 	 	}
 	 	#placeorderbmobile{
-	 		position:absolute;
-			font-size: 18px;
-			color: white;
+	 		position:fixed;
+			font-size: 28px;
+			color: black;
 			left: 50%;
 			width:90%;
-			bottom: 18%;
+			bottom:10%;
 			transform: translate(-50%, -50%);
-			padding: 10px 10px;
-			background-color: rgba(0,0,0,0.8);
+			padding: 5px;
+			background-color: lightgreen;
 			border: 1px solid black;
 	 	}
 	 	#generaloptions{

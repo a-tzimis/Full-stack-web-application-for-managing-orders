@@ -34,7 +34,7 @@ router.post('/public/getorder/', function(req, res){
 });
 
 router.post('/public/completeorder/', function(req, res){
-	bend.completeorder(req.body.table);
+	bend.completeorder(req.body.table, req.body.isserved);
 	res.send('ok');
 });
 
@@ -52,7 +52,10 @@ router.post('/public/alertseen/', function(req, res){
 	bend.alertseen(req.body.tablenumber, req.body.whosaw);
 	res.send('ok');
 });
-
+router.post('/public/setkitchenstate/', function (req, res) {
+	bend.setkitchenstate(req.body.tablenumber, req.body.whosaw, req.body.state);
+	res.send('ok');
+});
 router.post('/public/storenewprice/', function(req, res){
 	console.log("1");
 	bend.storenewprice(req.body.tablenumber, req.body.foodname, req.body.category, req.body.newprice);

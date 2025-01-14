@@ -1,4 +1,4 @@
-const MongoClient = require('mongodb').MongoClient;
+﻿const MongoClient = require('mongodb').MongoClient;
 
 exports.login = function(usrn, password){
 	const dbpromise = new Promise((resolve, reject) => {
@@ -50,21 +50,33 @@ exports.removetable = function(tablenumber){
 	}));
 };
 
-exports.completeorder = function(table){
+exports.completeorder = function(table, isserved){
 	var url = "mongodb://localhost:27017/";
 	const client = new MongoClient(url, { useNewUrlParser: true });
 		
 	client.connect((err => {
 		const collection = client.db("verna").collection("tables");
 		try {
-   			collection.updateOne(
-		      { "tnumber" : table.tnumber },
-		      { 
-		      	$set: {'torder' : table.torder, 'tgnotes' : table.tgnotes , 'talert' : table.talert},
-		      	$setOnInsert: {'tpeople' : table.tpeople , 'tnew' : table.tnew , 'ttime' : table.ttime ,'tstartersserved' : table.tstartersserved , 'tmainsserved' : table.tmainsserved}
-		      },
-		      { w: "majority", wtimeout: 5000 , upsert : true}
-   			)
+			if (isserved) {
+				collection.updateOne(
+					{ "tnumber": table.tnumber },
+					{
+						$set: { 'torder': table.torder, 'tgnotes': table.tgnotes, 'talert': table.talert, 'tstartersserved': table.tstartersserved, 'tmainsserved': table.tmainsserved },
+						$setOnInsert: { 'tpeople': table.tpeople, 'tnew': table.tnew, 'ttime': table.ttime }
+					},
+					{ w: "majority", wtimeout: 5000, upsert: true }
+				)
+			}
+			else {
+				collection.updateOne(
+					{ "tnumber": table.tnumber },
+					{
+						$set: { 'torder': table.torder, 'tgnotes': table.tgnotes, 'talert': table.talert },
+						$setOnInsert: { 'tpeople': table.tpeople, 'tnew': table.tnew, 'ttime': table.ttime, 'tstartersserved': table.tstartersserved, 'tmainsserved': table.tmainsserved }
+					},
+					{ w: "majority", wtimeout: 5000, upsert: true }
+				)
+			}
 
 		}catch(e){
 			console.log(e);
@@ -80,14 +92,14 @@ exports.settoseen = function(tablenumber, role){
 		
 	client.connect((err => {
 		const collection = client.db("verna").collection("tables");
-		if(role == 'boufe'){
+		if (role == 'kitchen'){
 			try {
 				collection.updateOne({tnumber : tablenumber} , { $set: { "tnew.0" : false } }  , write_concern = {'w':1});
 			}catch(e){
 				console.log(e);
 			}
 		}
-		else if(role == 'kitchen'){
+		else if(role == 'boufe'){
 			try {
 				collection.updateOne({tnumber : tablenumber} , { $set: { "tnew.1" : false } } , write_concern = {'w':1});
 			}catch(e){
@@ -98,45 +110,109 @@ exports.settoseen = function(tablenumber, role){
 	}));
 };
 
-exports.alertseen = function(tablenumber, role){
+exports.alertseen = function (tablenumber, role) {
+	console.log(tablenumber, role);
 	var url = "mongodb://localhost:27017/";
 	const client = new MongoClient(url, { useNewUrlParser: true });
-	let index;
-		
+	
 	client.connect((err => {
 		const collection = client.db("verna").collection("tables");
-		if(role == 'boufe'){
+		if (role == 'kitchen') {
 			try {
-				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.0" : false } }  , write_concern = {'w':1});
+				collection.findOne({ 'tnumber': tablenumber }).then(function (table) {
+					if (table.talert[4].includes("addonA")) {
+						let i;
+						for (i = 0; i < table.torder[0].length; i++) {
+							if (table.torder[0][i].fname.includes("[Ε]")) {
+								table.torder[0][i].fname = table.torder[0][i].fname.replace('[Ε]', '');
+							}
+						}
+						for (i = 0; i < table.torder[1].length; i++) {
+							if (table.torder[1][i].fname.includes("[Ε]")) {
+								table.torder[1][i].fname = table.torder[1][i].fname.replace('[Ε]', '');
+							}
+						}
+						//Update table with new order
+						collection.updateOne({ 'tnumber': tablenumber }, { $set: { 'torder': table.torder, 'talert.0': true } }, write_concern = { 'w': 1 });
+						client.close();
+					}
+					else {
+						collection.updateOne({ 'tnumber': tablenumber }, { $set: {'talert.0': true } }, write_concern = { 'w': 1 });
+						client.close();
+                    }
+				});
 			}catch(e){
 				console.log(e);
 			}
 		}
-		else if(role == 'kitchen'){
+		else if (role == 'boufe'){
 			try {
-				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.1" : false } } , write_concern = {'w':1});
+				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.1" : true } } , write_concern = {'w':1});
 			}catch(e){
 				console.log(e);
 			}
+			client.close();
 		}
 		else if(role == 'waiter'){
 			try {
-				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.2" : false } } , write_concern = {'w':1});
+				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.2" : true } } , write_concern = {'w':1});
 			}catch(e){
 				console.log(e);
 			}
+			client.close();
 		}
 		else if(role == 'owner'){
 			try {
-				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.3" : false } } , write_concern = {'w':1});
+				collection.updateOne({tnumber : tablenumber} , { $set: { "talert.3" : true } } , write_concern = {'w':1});
 			}catch(e){
 				console.log(e);
 			}
+			client.close();
 		}
-		client.close();
 	}));
 };
 
+exports.setkitchenstate = function (tablenumber, role, state) {
+	var url = "mongodb://localhost:27017/";
+	const client = new MongoClient(url, { useNewUrlParser: true });
+
+	client.connect((err => {
+		const collection = client.db("verna").collection("tables");
+		if (state == 'starters') {
+			if (role == 'kitchen') {
+				try {
+					collection.updateOne({ tnumber: tablenumber }, { $set: { "tstartersserved.0": true } }, write_concern = { 'w': 1 });
+				} catch (e) {
+					console.log(e);
+				}
+			}
+			else if (role == 'boufe') {
+				try {
+					collection.updateOne({ tnumber: tablenumber }, { $set: { "tstartersserved.1": true } }, write_concern = { 'w': 1 });
+				} catch (e) {
+					console.log(e);
+				}
+			}
+		}
+		else if (state == 'mains') {
+			if (role == 'kitchen') {
+				try {
+					collection.updateOne({ tnumber: tablenumber }, { $set: { "tmainsserved.0": true } }, write_concern = { 'w': 1 });
+				} catch (e) {
+					console.log(e);
+				}
+			}
+			else if (role == 'boufe') {
+				try {
+					collection.updateOne({ tnumber: tablenumber }, { $set: { "tmainsserved.1": true } }, write_concern = { 'w': 1 });
+				} catch (e) {
+					console.log(e);
+				}
+			}
+        }
+		client.close();
+	}));
+};
 exports.requestcheck = function(tablenumber){
 	var url = "mongodb://localhost:27017/";
 	const client = new MongoClient(url, { useNewUrlParser: true });
@@ -291,5 +367,3 @@ exports.getFood = function(type){
   	});
 	return dbpromise;
 };
-
-
