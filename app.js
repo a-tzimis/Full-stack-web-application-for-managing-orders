@@ -13,7 +13,7 @@ var app = express();
 app.use(session({
 	  cookieName: 'session',
 	  secret: 'olivia@123',
-	  duration: 60 * 60 * 1000, //1 hour
+	  duration: 60 * 60 * 12000, //12 hours
 	  activeDuration: 20 * 60 * 1000, //20mins
 }));
 
